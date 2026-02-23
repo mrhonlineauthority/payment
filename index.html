@@ -178,9 +178,51 @@
       border-radius: 24px;
     }
 
-    .radio-group label, .checkbox-group label {
-      font-weight: 500;
-      gap: 5px;
+    /* নতুন পেমেন্ট মেথড স্টাইল */
+    .payment-method-options {
+      display: flex;
+      gap: 15px;
+      justify-content: center;
+      margin: 10px 0;
+    }
+
+    .payment-option {
+      flex: 1;
+      max-width: 140px;
+      border: 2px solid #e2e8f0;
+      border-radius: 20px;
+      padding: 12px 8px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+      background: white;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .payment-option img {
+      width: 60px;
+      height: auto;
+      object-fit: contain;
+    }
+
+    .payment-option span {
+      font-weight: 600;
+      font-size: 1.1rem;
+      color: #1e2b4f;
+    }
+
+    /* হাইলাইট করার জন্য :has সাপোর্ট করে এমন ব্রাউজারে */
+    .payment-option:has(input:checked) {
+      border-color: #1e2b4f;
+      background: #e0e7ff;
+      box-shadow: 0 4px 8px rgba(30,43,79,0.2);
+    }
+
+    /* পুরনো রেডিও বাটন লুকানো */
+    .payment-option input[type="radio"] {
+      display: none;
     }
 
     .payment-hint {
@@ -322,15 +364,26 @@
     <div class="btn-row"><button type="button" class="secondary prevBtn" data-prev="2"><i class="fas fa-arrow-left"></i> Prev</button><button type="button" id="next3">Next <i class="fas fa-arrow-right"></i></button></div>
   </form>
 
-  <!-- step 4 form (payment) -->
+  <!-- step 4 form (payment) - লোগো সহ আপডেট -->
   <form id="step4Form" class="form-step">
     <div class="field-group"><label><i class="fas fa-credit-card"></i> Payment Method *</label>
-      <div class="radio-group" id="paymentMethodGroup"><label><input type="radio" name="paymentMethod" value="Bkash"> Bkash</label><label><input type="radio" name="paymentMethod" value="Nagad"> Nagad</label></div>
+      <div class="payment-method-options">
+        <label class="payment-option">
+          <input type="radio" name="paymentMethod" value="Bkash">
+          <img src="https://mrhonlineauthority.github.io/ebent/bkash.png" alt="Bkash Logo">
+          <span>Bkash</span>
+        </label>
+        <label class="payment-option">
+          <input type="radio" name="paymentMethod" value="Nagad">
+          <img src="https://mrhonlineauthority.github.io/ebent/nagad.png" alt="Nagad Logo">
+          <span>Nagad</span>
+        </label>
+      </div>
     </div>
     <div id="paymentHint" class="payment-hint hidden"><i class="fas fa-info-circle"></i> <span></span></div>
     <div class="field-group"><label><i class="fas fa-phone"></i> Your Payment Number *</label><input type="number" id="payNumber" placeholder="01xxxxxxxxx" required></div>
     <div class="field-group"><label><i class="fas fa-hashtag"></i> Transaction ID *</label><input type="text" id="transactionId" placeholder="e.g. Tx@ha34" required></div>
-    <div class="field-group"><label><i class="fas fa-coins"></i> Amount (BDT) *</label><input type="number" id="amount" min="1" required></div>
+    <div class="field-group"><label><i class="fas fa-coins"></i> Amount (BDT) *</label><input type="number" id="amount" min="20" max="500" required></div>
     <div class="btn-row"><button type="button" class="secondary prevBtn" data-prev="3"><i class="fas fa-arrow-left"></i> Prev</button><button type="button" id="next4">Verify & Next <i class="fas fa-arrow-right"></i></button></div>
   </form>
 
@@ -502,6 +555,12 @@
 
     if (!method || !payNumber || !txnId || !amount) {
       showError('Please fill all payment fields.');
+      return false;
+    }
+
+    // নতুন শর্ত: amount ২০-৫০০ এর মধ্যে হতে হবে
+    if (amount < 20 || amount > 500) {
+      showError('Donation amount must be between 20 and 500 BDT.');
       return false;
     }
 
