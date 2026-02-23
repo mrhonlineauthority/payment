@@ -1,0 +1,768 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
+  <title>M.R.H Donation · 5 step form</title>
+  <!-- Font Awesome 6 (free) for SVG-like icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Segoe UI', Roboto, system-ui, sans-serif;
+    }
+
+    body {
+      background: #f0f2f5;
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+      min-height: 100vh;
+      padding: 16px 10px;
+    }
+
+    .mobile-card {
+      max-width: 420px;
+      width: 100%;
+      background: white;
+      border-radius: 32px 32px 24px 24px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+      overflow: hidden;
+      padding: 20px 18px 28px;
+      margin: 0 auto;
+    }
+
+    .header {
+      text-align: center;
+      margin-bottom: 24px;
+    }
+
+    .header h1 {
+      font-size: 1.7rem;
+      font-weight: 700;
+      color: #1e2b4f;
+      letter-spacing: -0.3px;
+      line-height: 1.2;
+    }
+
+    .header h1 i {
+      color: #e63946;
+      font-size: 1.8rem;
+      margin-right: 6px;
+    }
+
+    .header .sub {
+      font-size: 1.2rem;
+      color: #2c3e70;
+      border-bottom: 2px solid #e0e7ff;
+      padding-bottom: 8px;
+      margin-top: 4px;
+      font-weight: 500;
+    }
+
+    /* step indicator */
+    .step-indicator {
+      display: flex;
+      justify-content: space-between;
+      margin: 16px 0 22px;
+      position: relative;
+    }
+
+    .step-indicator::before {
+      content: '';
+      position: absolute;
+      top: 18px;
+      left: 40px;
+      right: 40px;
+      height: 3px;
+      background: #d1d5db;
+      z-index: 0;
+    }
+
+    .step-item {
+      position: relative;
+      z-index: 2;
+      background: white;
+      text-align: center;
+      width: 50px;
+    }
+
+    .step-icon {
+      width: 42px;
+      height: 42px;
+      background: #e2e8f0;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 6px;
+      font-size: 1.3rem;
+      color: #1e2b4f;
+      border: 3px solid white;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+      transition: 0.2s;
+    }
+
+    .step-item.active .step-icon {
+      background: #1e2b4f;
+      color: white;
+      border-color: #a5b4fc;
+    }
+
+    .step-item.completed .step-icon {
+      background: #10b981;
+      color: white;
+    }
+
+    .step-label {
+      font-size: 0.7rem;
+      font-weight: 600;
+      color: #4b5563;
+    }
+
+    /* form steps */
+    .form-step {
+      display: none;
+      animation: fade 0.25s ease;
+    }
+
+    .form-step.active-step {
+      display: block;
+    }
+
+    @keyframes fade { from {opacity:0.3;} to {opacity:1;} }
+
+    .field-group {
+      margin-bottom: 18px;
+    }
+
+    label {
+      font-size: 0.9rem;
+      font-weight: 600;
+      color: #1f2937;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      margin-bottom: 5px;
+    }
+
+    label i {
+      width: 20px;
+      color: #4f46e5;
+    }
+
+    input, select, textarea {
+      width: 100%;
+      padding: 14px 16px;
+      border: 1.5px solid #e5e7eb;
+      border-radius: 20px;
+      font-size: 1rem;
+      background: white;
+      transition: 0.15s;
+      outline: none;
+    }
+
+    input:focus, select:focus {
+      border-color: #1e2b4f;
+      box-shadow: 0 0 0 3px rgba(30,43,79,0.1);
+    }
+
+    .radio-group, .checkbox-group {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 15px 20px;
+      background: #f8fafc;
+      padding: 12px 16px;
+      border-radius: 24px;
+    }
+
+    .radio-group label, .checkbox-group label {
+      font-weight: 500;
+      gap: 5px;
+    }
+
+    .payment-hint {
+      background: #fee2e2;
+      color: #b91c1c;
+      padding: 12px 14px;
+      border-radius: 18px;
+      font-size: 0.95rem;
+      margin: 15px 0 8px;
+      border-left: 5px solid #ef4444;
+      font-weight: 500;
+    }
+
+    .payment-hint i {
+      margin-right: 6px;
+    }
+
+    .btn-row {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 28px;
+      gap: 12px;
+    }
+
+    button {
+      flex: 1;
+      background: #1e2b4f;
+      border: none;
+      padding: 16px 10px;
+      border-radius: 40px;
+      font-size: 1.1rem;
+      font-weight: 600;
+      color: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      box-shadow: 0 8px 16px -6px #1e2b4f80;
+      transition: 0.15s;
+      cursor: pointer;
+      border: 1px solid #2d3a66;
+    }
+
+    button.secondary {
+      background: white;
+      color: #1e2b4f;
+      box-shadow: none;
+      border: 2px solid #cbd5e1;
+    }
+
+    button:active { transform: scale(0.97); }
+    button:disabled { opacity: 0.5; pointer-events: none; }
+
+    .error-message {
+      background: #ffeff0;
+      color: #c62828;
+      padding: 12px 16px;
+      border-radius: 24px;
+      margin: 10px 0;
+      font-size: 0.9rem;
+      border: 1px solid #f5c2c2;
+    }
+
+    /* receipt panel */
+    .receipt-panel {
+      background: #e6f7ec;
+      border-radius: 32px;
+      padding: 22px 18px;
+      margin: 20px 0 10px;
+      border: 2px solid #2e7d5e;
+    }
+
+    .receipt-panel h3 { color: #0b4f2e; margin-bottom: 12px; }
+    .receipt-line { display: flex; padding: 5px 0; border-bottom: 1px dashed #94c0a8; }
+    .receipt-line strong { width: 110px; }
+
+    .print-btn {
+      background: #0b4f2e;
+      color: white;
+      width: 100%;
+      margin-top: 12px;
+    }
+
+    .hidden { display: none; }
+    .small-note { font-size: 0.8rem; color: #dc2626; margin-top: 4px; }
+  </style>
+</head>
+<body>
+<div class="mobile-card" id="app">
+  <!-- header -->
+  <div class="header">
+    <h1><i class="fas fa-hand-holding-heart"></i> M.R.H Online <br>Registration Authority</h1>
+    <div class="sub">Donation Form <i class="fas fa-droplet" style="color:#2563eb;"></i></div>
+  </div>
+
+  <!-- step progress -->
+  <div class="step-indicator" id="stepIndicator">
+    <div class="step-item" data-step="1"><div class="step-icon"><i class="fas fa-user"></i></div><div class="step-label">Personal</div></div>
+    <div class="step-item" data-step="2"><div class="step-icon"><i class="fas fa-map-pin"></i></div><div class="step-label">Location</div></div>
+    <div class="step-item" data-step="3"><div class="step-icon"><i class="fas fa-calendar"></i></div><div class="step-label">Date</div></div>
+    <div class="step-item" data-step="4"><div class="step-icon"><i class="fas fa-credit-card"></i></div><div class="step-label">Payment</div></div>
+    <div class="step-item" data-step="5"><div class="step-icon"><i class="fas fa-shield-alt"></i></div><div class="step-label">Verification</div></div>
+  </div>
+
+  <!-- error / feedback container -->
+  <div id="globalError" class="error-message" style="display: none;"></div>
+
+  <!-- step 1 form -->
+  <form id="step1Form" class="form-step active-step">
+    <div class="field-group"><label><i class="fas fa-user-tie"></i> Full Name *</label><input type="text" id="fullName" placeholder="e.g. Md. Rahim" required></div>
+    <div class="field-group"><label><i class="fas fa-pray"></i> Religion *</label>
+      <select id="religion"><option value="">Select</option><option>Islam</option><option>Hindu</option><option>Buddhist</option><option>Christian</option><option>Others</option></select>
+    </div>
+    <div class="field-group"><label><i class="fas fa-venus-mars"></i> Sex *</label>
+      <div class="radio-group"><label><input type="radio" name="sex" value="Male"> Male</label><label><input type="radio" name="sex" value="Female"> Female</label><label><input type="radio" name="sex" value="Others"> Others</label></div>
+    </div>
+    <div class="field-group"><label><i class="fas fa-tint"></i> Blood Group *</label>
+      <select id="bloodGroup"><option value="">Select</option><option>A+</option><option>A-</option><option>B+</option><option>B-</option><option>AB+</option><option>AB-</option><option>O+</option><option>O-</option></select>
+    </div>
+    <div class="field-group"><label><i class="fas fa-phone-alt"></i> Mobile No *</label><input type="tel" id="mobile" placeholder="01xxxxxxxxx" required></div>
+    <div class="field-group"><label><i class="fas fa-envelope"></i> Email *</label><input type="email" id="email" placeholder="example@mail.com" required></div>
+    <div class="btn-row"><button type="button" class="secondary" disabled style="opacity:0.5"><i class="fas fa-arrow-left"></i> Prev</button><button type="button" id="next1"><i class="fas fa-arrow-right"></i> Next</button></div>
+  </form>
+
+  <!-- step 2 form -->
+  <form id="step2Form" class="form-step">
+    <div class="field-group"><label><i class="fas fa-globe"></i> Country *</label><input type="text" id="country" value="Bangladesh" required></div>
+    <div class="field-group"><label><i class="fas fa-map-signs"></i> Division *</label><input type="text" id="division" placeholder="Dhaka" required></div>
+    <div class="field-group"><label><i class="fas fa-city"></i> District *</label><input type="text" id="district" placeholder="Dhaka" required></div>
+    <div class="field-group"><label><i class="fas fa-map-marked-alt"></i> Upazila *</label><input type="text" id="upazila" placeholder="Savar" required></div>
+    <div class="field-group"><label><i class="fas fa-mail-bulk"></i> Post Code *</label><input type="text" id="postCode" placeholder="1340" required></div>
+    <div class="btn-row"><button type="button" class="secondary prevBtn" data-prev="1"><i class="fas fa-arrow-left"></i> Prev</button><button type="button" id="next2">Next <i class="fas fa-arrow-right"></i></button></div>
+  </form>
+
+  <!-- step 3 form -->
+  <form id="step3Form" class="form-step">
+    <div class="field-group"><label><i class="fas fa-birthday-cake"></i> Date of Birth *</label><input type="date" id="dob" required></div>
+    <div class="field-group"><label><i class="fas fa-calendar-check"></i> Date of Donated *</label><input type="date" id="donatedDate" required></div>
+    <div class="btn-row"><button type="button" class="secondary prevBtn" data-prev="2"><i class="fas fa-arrow-left"></i> Prev</button><button type="button" id="next3">Next <i class="fas fa-arrow-right"></i></button></div>
+  </form>
+
+  <!-- step 4 form (payment) -->
+  <form id="step4Form" class="form-step">
+    <div class="field-group"><label><i class="fas fa-credit-card"></i> Payment Method *</label>
+      <div class="radio-group" id="paymentMethodGroup"><label><input type="radio" name="paymentMethod" value="Bkash"> Bkash</label><label><input type="radio" name="paymentMethod" value="Nagad"> Nagad</label></div>
+    </div>
+    <div id="paymentHint" class="payment-hint hidden"><i class="fas fa-info-circle"></i> <span></span></div>
+    <div class="field-group"><label><i class="fas fa-phone"></i> Your Payment Number *</label><input type="number" id="payNumber" placeholder="01xxxxxxxxx" required></div>
+    <div class="field-group"><label><i class="fas fa-hashtag"></i> Transaction ID *</label><input type="text" id="transactionId" placeholder="e.g. Tx@ha34" required></div>
+    <div class="field-group"><label><i class="fas fa-coins"></i> Amount (BDT) *</label><input type="number" id="amount" min="1" required></div>
+    <div class="btn-row"><button type="button" class="secondary prevBtn" data-prev="3"><i class="fas fa-arrow-left"></i> Prev</button><button type="button" id="next4">Verify & Next <i class="fas fa-arrow-right"></i></button></div>
+  </form>
+
+  <!-- step 5 form (verification) -->
+  <form id="step5Form" class="form-step">
+    <div class="checkbox-group">
+      <label><input type="checkbox" id="anonymousCheck"> <i class="far fa-check-circle"></i> I haven't registered my ID card! I want to donate anonymously.</label>
+    </div>
+    <div id="idCardFields">
+      <div class="field-group"><label><i class="fas fa-id-card"></i> ID No (mobile) *</label><input type="text" id="idNo" placeholder="01xxxxxxxxx"></div>
+      <div class="field-group"><label><i class="fas fa-calendar-plus"></i> Registration/Recovery Date *</label><input type="date" id="regDate"></div>
+      <div class="field-group"><label><i class="fas fa-calendar-times"></i> Expired Date *</label><input type="date" id="expDate"></div>
+    </div>
+    <div class="btn-row"><button type="button" class="secondary prevBtn" data-prev="4"><i class="fas fa-arrow-left"></i> Prev</button><button type="button" id="finalSubmit">Submit <i class="fas fa-paper-plane"></i></button></div>
+  </form>
+
+  <!-- receipt area (hidden initially) -->
+  <div id="receiptContainer" class="hidden"></div>
+</div>
+
+<!-- Firebase SDK (modular) -->
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-app.js";
+  import { getAnalytics } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-analytics.js";
+  import { getDatabase, ref, get, child, update, push } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-database.js";
+
+  // Firebase config
+  const firebaseConfig = {
+    apiKey: "AIzaSyDURq4S_a9v0oHeUUjq8gZtpQd6QiStU14",
+    authDomain: "donationinfo-1e55e.firebaseapp.com",
+    databaseURL: "https://donationinfo-1e55e-default-rtdb.firebaseio.com",
+    projectId: "donationinfo-1e55e",
+    storageBucket: "donationinfo-1e55e.firebasestorage.app",
+    messagingSenderId: "990100425970",
+    appId: "1:990100425970:web:3ef282d31774bde6d3146b",
+    measurementId: "G-F87THPVXBJ"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const analytics = getAnalytics(app);
+  const db = getDatabase(app);
+
+  // ---------- DOM elements ----------
+  let currentStep = 1;
+  const stepForms = {
+    1: document.getElementById('step1Form'),
+    2: document.getElementById('step2Form'),
+    3: document.getElementById('step3Form'),
+    4: document.getElementById('step4Form'),
+    5: document.getElementById('step5Form')
+  };
+  const stepItems = document.querySelectorAll('.step-item');
+  const globalError = document.getElementById('globalError');
+
+  // navigation
+  const next1 = document.getElementById('next1');
+  const next2 = document.getElementById('next2');
+  const next3 = document.getElementById('next3');
+  const next4 = document.getElementById('next4');
+  const finalSubmit = document.getElementById('finalSubmit');
+  const prevBtns = document.querySelectorAll('.prevBtn');
+
+  // step 4 extra
+  const paymentMethodRadios = document.getElementsByName('paymentMethod');
+  const paymentHint = document.getElementById('paymentHint');
+  const hintSpan = paymentHint.querySelector('span');
+
+  // step 5
+  const anonymousCheck = document.getElementById('anonymousCheck');
+  const idCardFieldsDiv = document.getElementById('idCardFields');
+  const idNo = document.getElementById('idNo');
+  const regDate = document.getElementById('regDate');
+  const expDate = document.getElementById('expDate');
+
+  // temp data storage
+  let formData = {};
+  let matchedTransactionKey = null;
+  let matchedTransactionData = null;   // পুরো ট্রানজেকশন অবজেক্ট রাখার জন্য
+  let isSubmitting = false; // prevent double submission
+
+  // ---------- helper functions ----------
+  function showError(msg) {
+    globalError.style.display = 'block';
+    globalError.innerText = msg;
+    setTimeout(() => { globalError.style.display = 'none'; }, 5000);
+  }
+
+  function clearError() { globalError.style.display = 'none'; }
+
+  function updateStepUI(step) {
+    stepItems.forEach((item, idx) => {
+      const stepNum = idx + 1;
+      item.classList.remove('active', 'completed');
+      if (stepNum === step) item.classList.add('active');
+      else if (stepNum < step) item.classList.add('completed');
+    });
+    Object.values(stepForms).forEach(f => f.classList.remove('active-step'));
+    stepForms[step].classList.add('active-step');
+  }
+
+  // validate step1 fields
+  function validateStep1() {
+    const name = document.getElementById('fullName').value.trim();
+    const religion = document.getElementById('religion').value;
+    const sex = document.querySelector('input[name="sex"]:checked');
+    const blood = document.getElementById('bloodGroup').value;
+    const mobile = document.getElementById('mobile').value.trim();
+    const email = document.getElementById('email').value.trim();
+    if (!name || !religion || !sex || !blood || !mobile || !email) return false;
+    return true;
+  }
+
+  function collectStep1() {
+    formData.name = document.getElementById('fullName').value.trim();
+    formData.religion = document.getElementById('religion').value;
+    formData.sex = document.querySelector('input[name="sex"]:checked')?.value;
+    formData.bloodGroup = document.getElementById('bloodGroup').value;
+    formData.mobile = document.getElementById('mobile').value.trim();
+    formData.email = document.getElementById('email').value.trim();
+  }
+
+  // step2
+  function validateStep2() {
+    return ['country','division','district','upazila','postCode'].every(id => document.getElementById(id).value.trim() !== '');
+  }
+  function collectStep2() {
+    formData.country = document.getElementById('country').value.trim();
+    formData.division = document.getElementById('division').value.trim();
+    formData.district = document.getElementById('district').value.trim();
+    formData.upazila = document.getElementById('upazila').value.trim();
+    formData.postCode = document.getElementById('postCode').value.trim();
+  }
+
+  // step3
+  function validateStep3() {
+    return document.getElementById('dob').value && document.getElementById('donatedDate').value;
+  }
+  function collectStep3() {
+    formData.dob = document.getElementById('dob').value;
+    formData.donatedDate = document.getElementById('donatedDate').value;
+  }
+
+  // step4 collect (validation done separately with DB)
+  function collectStep4() {
+    formData.paymentMethod = document.querySelector('input[name="paymentMethod"]:checked')?.value;
+    formData.payNumber = document.getElementById('payNumber').value.trim();
+    formData.transactionId = document.getElementById('transactionId').value.trim();
+    formData.amount = Number(document.getElementById('amount').value);
+  }
+
+  // step5 collect (id fields if not anonymous)
+  function collectStep5() {
+    formData.anonymous = anonymousCheck.checked;
+    if (!anonymousCheck.checked) {
+      formData.idNo = idNo.value.trim();
+      formData.regDate = regDate.value;
+      formData.expDate = expDate.value;
+    } else {
+      delete formData.idNo; delete formData.regDate; delete formData.expDate;
+    }
+  }
+
+  // ---- PAYMENT VALIDATION (against transactions) ----
+  async function validatePaymentAgainstDB() {
+    const method = document.querySelector('input[name="paymentMethod"]:checked')?.value;
+    const payNumber = document.getElementById('payNumber').value.trim();
+    const txnId = document.getElementById('transactionId').value.trim();
+    const amount = Number(document.getElementById('amount').value);
+
+    if (!method || !payNumber || !txnId || !amount) {
+      showError('Please fill all payment fields.');
+      return false;
+    }
+
+    try {
+      const dbRef = ref(db);
+      const snapshot = await get(child(dbRef, 'transactions'));
+      if (snapshot.exists()) {
+        const transactions = snapshot.val();
+        let foundKey = null;
+        for (let key in transactions) {
+          const t = transactions[key];
+          // strict match: method, paynumber, amount, used===false, and the key itself must equal the transactionId (since key is Tx@...)
+          if (t.method === method && String(t.paynumber) === payNumber && t.amount === amount && t.used === false && key === txnId) {
+            foundKey = key;
+            matchedTransactionData = { ...t };   // পুরো অবজেক্ট কপি করে রাখি
+            break;
+          }
+        }
+        if (foundKey) {
+          matchedTransactionKey = foundKey;
+          return true;
+        } else {
+          showError('❌ Payment info does not match any unused transaction. Check method, number, amount, or transaction ID.');
+          return false;
+        }
+      } else {
+        showError('No transactions found in DB.');
+        return false;
+      }
+    } catch (err) {
+      showError('Firebase error: ' + err.message);
+      return false;
+    }
+  }
+
+  // ---- ID CARD VALIDATION ----
+  async function validateIdCard() {
+    if (anonymousCheck.checked) return true;
+    const id = idNo.value.trim();
+    const reg = regDate.value;
+    const exp = expDate.value;
+    if (!id || !reg || !exp) {
+      showError('Please fill ID card details or check anonymous.');
+      return false;
+    }
+    try {
+      const dbRef = ref(db);
+      const snapshot = await get(child(dbRef, `idCards/${id}`));
+      if (snapshot.exists()) {
+        const card = snapshot.val();
+        if (card.registrationDate === reg && card.expiryDate === exp) {
+          return true;
+        } else {
+          showError('ID card dates do not match our record.');
+          return false;
+        }
+      } else {
+        showError('ID number not registered.');
+        return false;
+      }
+    } catch (err) {
+      showError('ID check error: ' + err.message);
+      return false;
+    }
+  }
+
+  // ---- ATOMIC SUBMISSION (donation + mark transaction used) ----
+  async function submitDonation() {
+    if (isSubmitting) return false;
+    isSubmitting = true;
+    finalSubmit.disabled = true;
+
+    // re-validate transaction is still unused (double-check)
+    if (!matchedTransactionKey || !matchedTransactionData) {
+      showError('Payment verification lost. Please go back to step 4.');
+      isSubmitting = false;
+      finalSubmit.disabled = false;
+      return false;
+    }
+
+    try {
+      const dbRef = ref(db);
+      // verify the transaction is still unused
+      const txnSnap = await get(child(dbRef, `transactions/${matchedTransactionKey}`));
+      if (!txnSnap.exists() || txnSnap.val().used === true) {
+        showError('This transaction has already been used. Please use a different one.');
+        isSubmitting = false;
+        finalSubmit.disabled = false;
+        return false;
+      }
+
+      // validate ID card (if not anonymous)
+      const idValid = await validateIdCard();
+      if (!idValid) {
+        isSubmitting = false;
+        finalSubmit.disabled = false;
+        return false;
+      }
+
+      // prepare final donation object
+      const donationRecord = {
+        ...formData,
+        timestamp: Date.now(),
+        transactionKey: matchedTransactionKey,
+        status: 'completed'
+      };
+
+      // Generate new donation key
+      const donationKey = push(child(dbRef, 'donations')).key;
+
+      // পুরো ট্রানজেকশন অবজেক্টটি used: true করে নিন
+      const updatedTransaction = { ...matchedTransactionData, used: true };
+
+      // Atomic multi-path update: add donation + replace whole transaction with used=true
+      const updates = {};
+      updates[`donations/${donationKey}`] = donationRecord;
+      updates[`transactions/${matchedTransactionKey}`] = updatedTransaction;   // পুরো নোড আপডেট
+
+      await update(ref(db), updates);
+
+      // Success: clear matched data and show receipt
+      matchedTransactionKey = null;
+      matchedTransactionData = null;
+      showReceipt(donationRecord);
+
+      // Disable all step forms and hide step indicator
+      document.querySelectorAll('.form-step').forEach(f => f.style.display = 'none');
+      document.querySelector('.step-indicator').style.display = 'none';
+
+      return true;
+    } catch (err) {
+      showError('Submission failed: ' + err.message);
+      isSubmitting = false;
+      finalSubmit.disabled = false;
+      return false;
+    }
+  }
+
+  function showReceipt(data) {
+    const receiptDiv = document.getElementById('receiptContainer');
+    receiptDiv.classList.remove('hidden');
+    receiptDiv.innerHTML = `
+      <div class="receipt-panel">
+        <h3><i class="fas fa-receipt"></i> Donation Receipt</h3>
+        <div class="receipt-line"><strong>Name</strong> <span>${data.name || ''}</span></div>
+        <div class="receipt-line"><strong>Mobile</strong> <span>${data.mobile || ''}</span></div>
+        <div class="receipt-line"><strong>Amount</strong> <span>${data.amount} BDT</span></div>
+        <div class="receipt-line"><strong>Payment</strong> <span>${data.paymentMethod} (${data.transactionId})</span></div>
+        <div class="receipt-line"><strong>Donated on</strong> <span>${data.donatedDate || ''}</span></div>
+        <div class="receipt-line"><strong>ID card</strong> <span>${data.anonymous ? 'Anonymous' : data.idNo}</span></div>
+        <div style="text-align:center; margin-top: 16px;">Thank you for donating ❤️</div>
+        <button class="print-btn" onclick="window.print()"><i class="fas fa-print"></i> Print / A4</button>
+      </div>
+    `;
+  }
+
+  // ---- event listeners ----
+  next1.addEventListener('click', () => {
+    if (validateStep1()) {
+      collectStep1();
+      currentStep = 2;
+      updateStepUI(2);
+    } else showError('Please fill all fields in Personal Info');
+  });
+
+  next2.addEventListener('click', () => {
+    if (validateStep2()) {
+      collectStep2();
+      currentStep = 3;
+      updateStepUI(3);
+    } else showError('All location fields required');
+  });
+
+  next3.addEventListener('click', () => {
+    if (validateStep3()) {
+      collectStep3();
+      currentStep = 4;
+      updateStepUI(4);
+    } else showError('Select both dates');
+  });
+
+  // step4 next with payment validation
+  next4.addEventListener('click', async () => {
+    collectStep4();
+    if (await validatePaymentAgainstDB()) {
+      currentStep = 5;
+      updateStepUI(5);
+    }
+  });
+
+  // final submit
+  finalSubmit.addEventListener('click', async (e) => {
+    e.preventDefault();
+    collectStep5();
+    await submitDonation();
+  });
+
+  // previous buttons
+  prevBtns.forEach(btn => {
+    btn.addEventListener('click', () => {
+      const prev = parseInt(btn.dataset.prev);
+      currentStep = prev;
+      updateStepUI(prev);
+    });
+  });
+
+  // payment method hint
+  paymentMethodRadios.forEach(radio => {
+    radio.addEventListener('change', (e) => {
+      const val = e.target.value;
+      if (val === 'Bkash') {
+        paymentHint.classList.remove('hidden');
+        hintSpan.innerText = 'Send money to bKash to this number 01864052852';
+      } else if (val === 'Nagad') {
+        paymentHint.classList.remove('hidden');
+        hintSpan.innerText = 'Send money to Nagad to this number 01328068115';
+      } else paymentHint.classList.add('hidden');
+    });
+  });
+
+  // toggle id fields on anonymous checkbox
+  anonymousCheck.addEventListener('change', (e) => {
+    const checked = e.target.checked;
+    const inputs = [idNo, regDate, expDate];
+    if (checked) {
+      inputs.forEach(i => { i.disabled = true; i.value = ''; });
+    } else {
+      inputs.forEach(i => i.disabled = false);
+    }
+  });
+
+  console.log('App ready – atomic update with full transaction object');
+</script>
+
+<!-- ========== FIREBASE DATABASE RULES (copy & paste in Firebase console) ========== -->
+<!--
+{
+  "rules": {
+    "idCards": {
+      ".read": "true",
+      ".write": false,
+      "$uid": {
+        ".validate": "newData.hasChildren(['registrationDate', 'expiryDate']) && newData.child('registrationDate').isString() && newData.child('expiryDate').isString()"
+      }
+    },
+    "transactions": {
+      ".read": "true",
+      "$txn": {
+        ".write": "data.exists() && newData.hasChildren(['amount', 'method', 'paynumber', 'used']) && newData.child('used').val() === true && data.child('used').val() === false && newData.child('amount').val() === data.child('amount').val() && newData.child('method').val() === data.child('method').val() && newData.child('paynumber').val() === data.child('paynumber').val()"
+      }
+    },
+    "donations": {
+      ".read": false,
+      ".write": true,
+      "$donation": {
+        ".validate": "newData.hasChildren(['name', 'mobile', 'amount', 'paymentMethod', 'transactionKey', 'timestamp'])",
+        "transactionKey": { ".validate": "root.child('transactions/'+newData.val()).exists()" }
+      }
+    }
+  }
+}
+-->
+</body>
+</html>
