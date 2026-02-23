@@ -1,0 +1,405 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Panel - Donation System</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Roboto, sans-serif;
+        }
+        body {
+            background: #f0f2f5;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+        .admin-card {
+            max-width: 600px;
+            width: 100%;
+            background: white;
+            border-radius: 24px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            padding: 30px 25px;
+        }
+        h1 {
+            font-size: 2rem;
+            color: #1e2b4f;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        h1 i {
+            color: #e63946;
+        }
+        .login-form, .admin-panel {
+            display: none;
+        }
+        .login-form.active, .admin-panel.active {
+            display: block;
+        }
+        .field-group {
+            margin-bottom: 20px;
+        }
+        label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 6px;
+            color: #2c3e70;
+        }
+        input, select {
+            width: 100%;
+            padding: 12px 16px;
+            border: 1.5px solid #e5e7eb;
+            border-radius: 14px;
+            font-size: 1rem;
+            outline: none;
+            transition: 0.15s;
+        }
+        input:focus, select:focus {
+            border-color: #1e2b4f;
+            box-shadow: 0 0 0 3px rgba(30,43,79,0.1);
+        }
+        button {
+            background: #1e2b4f;
+            color: white;
+            border: none;
+            padding: 14px 20px;
+            border-radius: 40px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            width: 100%;
+            transition: 0.15s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+        button:hover {
+            background: #2c3e70;
+        }
+        button.secondary {
+            background: #e0e7ff;
+            color: #1e2b4f;
+            margin-top: 10px;
+        }
+        .error-message {
+            background: #fee2e2;
+            color: #b91c1c;
+            padding: 12px;
+            border-radius: 16px;
+            margin-bottom: 20px;
+            font-weight: 500;
+        }
+        .success-message {
+            background: #e0f2e1;
+            color: #0b4f2e;
+            padding: 12px;
+            border-radius: 16px;
+            margin-bottom: 20px;
+            font-weight: 500;
+        }
+        .transaction-list {
+            margin-top: 30px;
+            max-height: 400px;
+            overflow-y: auto;
+            border: 1px solid #e2e8f0;
+            border-radius: 16px;
+            padding: 10px;
+        }
+        .transaction-item {
+            background: #f8fafc;
+            padding: 12px;
+            border-radius: 12px;
+            margin-bottom: 8px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-left: 5px solid #4f46e5;
+        }
+        .transaction-item .details {
+            font-size: 0.9rem;
+        }
+        .transaction-item .details strong {
+            display: block;
+            color: #1e2b4f;
+        }
+        .transaction-item .status {
+            font-size: 0.8rem;
+            padding: 4px 8px;
+            border-radius: 20px;
+            background: #e2e8f0;
+        }
+        .transaction-item .status.used {
+            background: #fecaca;
+            color: #b91c1c;
+        }
+        .transaction-item .status.unused {
+            background: #bbf7d0;
+            color: #166534;
+        }
+        .logout-btn {
+            background: transparent;
+            color: #1e2b4f;
+            border: 2px solid #1e2b4f;
+            margin-top: 20px;
+            padding: 10px;
+        }
+        .logout-btn:hover {
+            background: #1e2b4f;
+            color: white;
+        }
+        .small-note {
+            font-size: 0.85rem;
+            color: #6b7280;
+            margin-top: 5px;
+        }
+    </style>
+</head>
+<body>
+<div class="admin-card">
+    <h1><i class="fas fa-user-shield"></i> Admin Panel</h1>
+
+    <!-- Login Form -->
+    <div id="loginForm" class="login-form active">
+        <div id="loginError" class="error-message" style="display: none;"></div>
+        <div class="field-group">
+            <label><i class="fas fa-envelope"></i> Email</label>
+            <input type="email" id="email" placeholder="admin@example.com" value="admin@example.com">
+        </div>
+        <div class="field-group">
+            <label><i class="fas fa-lock"></i> Password</label>
+            <input type="password" id="password" placeholder="••••••••" value="123456">
+        </div>
+        <button id="loginBtn"><i class="fas fa-sign-in-alt"></i> Login</button>
+        <p class="small-note">Use any email/password (must be registered in Firebase Auth)</p>
+    </div>
+
+    <!-- Admin Panel (after login) -->
+    <div id="adminPanel" class="admin-panel">
+        <div id="adminMessage" class="success-message" style="display: none;"></div>
+        
+        <h2><i class="fas fa-plus-circle"></i> Add New Transaction</h2>
+        <form id="addTransactionForm">
+            <div class="field-group">
+                <label>Transaction ID (Key)</label>
+                <input type="text" id="txnId" placeholder="e.g. Tx@ha34" required>
+            </div>
+            <div class="field-group">
+                <label>Method</label>
+                <select id="method" required>
+                    <option value="Bkash">Bkash</option>
+                    <option value="Nagad">Nagad</option>
+                </select>
+            </div>
+            <div class="field-group">
+                <label>Pay Number</label>
+                <input type="text" id="payNumber" placeholder="01xxxxxxxxx" required>
+            </div>
+            <div class="field-group">
+                <label>Amount (BDT)</label>
+                <input type="number" id="amount" min="1" required>
+            </div>
+            <button type="submit"><i class="fas fa-save"></i> Add Transaction</button>
+        </form>
+
+        <h2 style="margin-top: 30px;"><i class="fas fa-list"></i> Existing Transactions</h2>
+        <div id="transactionList" class="transaction-list">
+            <!-- dynamically loaded -->
+            <p style="text-align: center; color: #6b7280;">Loading...</p>
+        </div>
+
+        <button id="logoutBtn" class="logout-btn"><i class="fas fa-sign-out-alt"></i> Logout</button>
+    </div>
+</div>
+
+<!-- Firebase SDK -->
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-app.js";
+    import { getAnalytics } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-analytics.js";
+    import { getDatabase, ref, get, set, child, onValue, remove } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-database.js";
+    import { getAuth, signInWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-auth.js";
+
+    // Firebase config
+    const firebaseConfig = {
+        apiKey: "AIzaSyDURq4S_a9v0oHeUUjq8gZtpQd6QiStU14",
+        authDomain: "donationinfo-1e55e.firebaseapp.com",
+        databaseURL: "https://donationinfo-1e55e-default-rtdb.firebaseio.com",
+        projectId: "donationinfo-1e55e",
+        storageBucket: "donationinfo-1e55e.firebasestorage.app",
+        messagingSenderId: "990100425970",
+        appId: "1:990100425970:web:3ef282d31774bde6d3146b",
+        measurementId: "G-F87THPVXBJ"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const analytics = getAnalytics(app);
+    const db = getDatabase(app);
+    const auth = getAuth(app);
+
+    // DOM elements
+    const loginForm = document.getElementById('loginForm');
+    const adminPanel = document.getElementById('adminPanel');
+    const loginBtn = document.getElementById('loginBtn');
+    const logoutBtn = document.getElementById('logoutBtn');
+    const loginError = document.getElementById('loginError');
+    const adminMessage = document.getElementById('adminMessage');
+    const emailInput = document.getElementById('email');
+    const passwordInput = document.getElementById('password');
+    const addForm = document.getElementById('addTransactionForm');
+    const txnIdInput = document.getElementById('txnId');
+    const methodInput = document.getElementById('method');
+    const payNumberInput = document.getElementById('payNumber');
+    const amountInput = document.getElementById('amount');
+    const transactionListDiv = document.getElementById('transactionList');
+
+    // Helper: show message
+    function showMessage(element, text, isSuccess = true) {
+        element.style.display = 'block';
+        element.textContent = text;
+        element.className = isSuccess ? 'success-message' : 'error-message';
+        setTimeout(() => { element.style.display = 'none'; }, 3000);
+    }
+
+    // Check auth state
+    onAuthStateChanged(auth, (user) => {
+        if (user) {
+            // User is logged in
+            loginForm.classList.remove('active');
+            adminPanel.classList.add('active');
+            loadTransactions();
+        } else {
+            loginForm.classList.add('active');
+            adminPanel.classList.remove('active');
+        }
+    });
+
+    // Login
+    loginBtn.addEventListener('click', async () => {
+        const email = emailInput.value.trim();
+        const password = passwordInput.value.trim();
+        if (!email || !password) {
+            showMessage(loginError, 'Email and password required', false);
+            return;
+        }
+        try {
+            await signInWithEmailAndPassword(auth, email, password);
+        } catch (error) {
+            showMessage(loginError, 'Login failed: ' + error.message, false);
+        }
+    });
+
+    // Logout
+    logoutBtn.addEventListener('click', async () => {
+        await signOut(auth);
+    });
+
+    // Load transactions
+    function loadTransactions() {
+        const transactionsRef = ref(db, 'transactions');
+        onValue(transactionsRef, (snapshot) => {
+            if (snapshot.exists()) {
+                const data = snapshot.val();
+                let html = '';
+                // Convert to array and sort by key maybe
+                Object.keys(data).sort().forEach(key => {
+                    const txn = data[key];
+                    const statusClass = txn.used ? 'used' : 'unused';
+                    const statusText = txn.used ? 'Used' : 'Unused';
+                    html += `
+                        <div class="transaction-item">
+                            <div class="details">
+                                <strong>${key}</strong>
+                                <span>${txn.method} | ${txn.paynumber} | ${txn.amount} BDT</span>
+                            </div>
+                            <div class="status ${statusClass}">${statusText}</div>
+                        </div>
+                    `;
+                });
+                transactionListDiv.innerHTML = html;
+            } else {
+                transactionListDiv.innerHTML = '<p style="text-align: center; color: #6b7280;">No transactions found.</p>';
+            }
+        }, (error) => {
+            transactionListDiv.innerHTML = '<p style="text-align: center; color: #b91c1c;">Error loading transactions.</p>';
+        });
+    }
+
+    // Add new transaction
+    addForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const txnId = txnIdInput.value.trim();
+        const method = methodInput.value;
+        const payNumber = payNumberInput.value.trim();
+        const amount = Number(amountInput.value);
+
+        if (!txnId || !method || !payNumber || !amount) {
+            showMessage(adminMessage, 'All fields required', false);
+            return;
+        }
+
+        // Check if transaction ID already exists
+        const txnRef = ref(db, `transactions/${txnId}`);
+        try {
+            const snapshot = await get(txnRef);
+            if (snapshot.exists()) {
+                showMessage(adminMessage, 'Transaction ID already exists!', false);
+                return;
+            }
+
+            // Add new transaction with used: false
+            await set(txnRef, {
+                method: method,
+                paynumber: payNumber,
+                amount: amount,
+                used: false
+            });
+
+            showMessage(adminMessage, 'Transaction added successfully!');
+            addForm.reset(); // clear form
+            // List will auto-update via onValue
+        } catch (error) {
+            showMessage(adminMessage, 'Error: ' + error.message, false);
+        }
+    });
+</script>
+
+<!-- Updated Firebase Rules (copy and paste in Firebase Console) -->
+<!--
+{
+  "rules": {
+    "idCards": {
+      ".read": "true",
+      ".write": false,
+      "$uid": {
+        ".validate": "newData.hasChildren(['registrationDate', 'expiryDate']) && newData.child('registrationDate').isString() && newData.child('expiryDate').isString()"
+      }
+    },
+    "transactions": {
+      ".read": "true",
+      ".write": "auth != null",  // Allow any authenticated admin to write
+      "$txn": {
+        ".validate": "newData.hasChildren(['amount', 'method', 'paynumber', 'used']) && newData.child('used').isBoolean() && newData.child('amount').isNumber() && newData.child('method').isString() && newData.child('paynumber').isString()"
+      }
+    },
+    "donations": {
+      ".read": false,
+      ".write": true,
+      "$donation": {
+        ".validate": "newData.hasChildren(['name', 'mobile', 'amount', 'paymentMethod', 'transactionKey', 'timestamp'])",
+        "transactionKey": { ".validate": "root.child('transactions/'+newData.val()).exists()" }
+      }
+    }
+  }
+}
+-->
+</body>
+</html>
